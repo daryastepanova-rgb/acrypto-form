@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A-CRYPTO — Заявка на обмен</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #D32F2F;
+    --red-light: #FF5252;
+    --red-dark: #B71C1C;
+    --black: #0A0A0A;
+    --black2: #111111;
+    --black3: #1A1A1A;
+    --black4: #222222;
+    --border: rgba(211,47,47,0.2);
+    --border-hover: rgba(211,47,47,0.5);
+    --text: #F5F5F5;
+    --text-muted: #777;
+    --green: #43A047;
+    --white: #ffffff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 36px 16px 60px;
+  }
+
+  .container { width: 100%; max-width: 500px; }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp .5s ease .05s forwards;
+  }
+
+  .logo-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+
+  /* SVG logo recreation */
+  .logo-svg-wrap {
+    width: 80px;
+    height: 80px;
+    filter: drop-shadow(0 4px 18px rgba(211,47,47,0.35));
+  }
+
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 5px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .header h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 34px;
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--white);
+  }
+
+  .header h2 span { color: var(--red); }
+
+  .header p {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ── STEPS ── */
+  .steps {
+    display: flex;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp .5s ease .15s forwards;
+  }
+
+  .step { flex: 1; text-align: center; position: relative; }
+
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 13px; right: 0;
+    width: 100%; height: 1px;
+    background: var(--border);
+    z-index: 0;
+  }
+
+  .step-dot {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    color: var(--text-muted);
+    margin: 0 auto 5px;
+    background: var(--black);
+    position: relative; z-index: 1;
+    transition: all .3s;
+  }
+
+  .step.active .step-dot { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 0 14px rgba(211,47,47,.45); }
+  .step.done .step-dot { background: var(--green); border-color: var(--green); color: #fff; }
+
+  .step-label { font-size: 10px; color: var(--text-muted); font-weight: 600; letter-spacing: .5px; }
+  .step.active .step-label { color: var(--red); }
+  .step.done .step-label { color: var(--green); }
+
+  /* ── CARD ── */
+  .form-card {
+    background: var(--black2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 24px 22px;
+    margin-bottom: 12px;
+    opacity: 0;
+    animation: fadeUp .5s ease .25s forwards;
+  }
+
+  /* Red top accent */
+  .form-card::before {
+    content: '';
+    display: block;
+    height: 3px;
+    background: linear-gradient(90deg, var(--red-dark), var(--red-light));
+    border-radius: 3px 3px 0 0;
+    margin: -24px -24px 20px;
+    border-radius: 15px 15px 0 0;
+  }
+
+  .section-title {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .section-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: var(--border);
+  }
+
+  /* ── EXCHANGE ROW ── */
+  .exchange-row {
+    display: grid;
+    grid-template-columns: 1fr 28px 1fr;
+    gap: 8px;
+    align-items: end;
+    margin-bottom: 18px;
+  }
+
+  .col-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .arrow-mid {
+    display: flex; align-items: center; justify-content: center;
+    padding-bottom: 3px; color: var(--red);
+  }
+
+  /* ── INPUTS ── */
+  select, input, textarea {
+    width: 100%;
+    background: var(--black3);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 9px;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    -webkit-appearance: none; appearance: none;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    padding-right: 30px;
+    cursor: pointer;
+    margin-bottom: 6px;
+  }
+
+  select option { background: #1a1a1a; }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(211,47,47,.1);
+  }
+
+  input::placeholder, textarea::placeholder { color: #444; }
+
+  .amount-wrap { position: relative; }
+  .amount-wrap input { padding-right: 46px; }
+  .cur-tag {
+    position: absolute; right: 11px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px; font-weight: 700;
+    color: var(--red); pointer-events: none; letter-spacing: .5px;
+  }
+
+  textarea { resize: none; height: 76px; line-height: 1.55; }
+
+  /* ── PAYMENT BUTTONS ── */
+  .pay-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; }
+
+  .pay-opt {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 9px; padding: 10px 4px;
+    text-align: center; cursor: pointer;
+    background: var(--black3);
+    transition: all .2s;
+  }
+
+  .pay-opt:hover { border-color: var(--border-hover); }
+
+  .pay-opt.sel {
+    border-color: var(--red);
+    background: rgba(211,47,47,.1);
+    box-shadow: 0 0 12px rgba(211,47,47,.15);
+  }
+
+  .pay-icon { font-size: 17px; display: block; margin-bottom: 4px; }
+  .pay-lbl { font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: .3px; transition: color .2s; }
+  .pay-opt.sel .pay-lbl { color: var(--red-light); }
+
+  /* ── DIVIDER ── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+
+  /* ── SUMMARY BAR ── */
+  .summary {
+    background: rgba(211,47,47,.07);
+    border: 1px solid rgba(211,47,47,.2);
+    border-radius: 10px; padding: 12px 14px;
+    font-size: 13px; color: var(--text-muted);
+    line-height: 1.5; margin-bottom: 18px;
+  }
+
+  /* ── FIELD wrapper ── */
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 6px;
+  }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    width: 100%;
+    background: var(--red);
+    color: #fff; border: none;
+    border-radius: 11px; padding: 15px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px; letter-spacing: 2.5px;
+    cursor: pointer; transition: all .2s;
+    box-shadow: 0 4px 20px rgba(211,47,47,.35);
+  }
+
+  .btn-primary:hover { background: var(--red-light); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(211,47,47,.45); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-back {
+    flex: 0 0 52px;
+    background: var(--black3);
+    color: var(--text); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 11px; padding: 15px;
+    font-size: 18px; cursor: pointer;
+    transition: all .2s;
+  }
+
+  .btn-back:hover { border-color: var(--border-hover); }
+
+  .row-btns { display: flex; gap: 10px; }
+
+  /* ── TRUST LINE ── */
+  .trust {
+    display: flex; flex-wrap: wrap;
+    justify-content: center; gap: 14px;
+    padding-top: 14px;
+    opacity: 0;
+    animation: fadeUp .5s ease .35s forwards;
+  }
+
+  .trust-item {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 600;
+    color: var(--text-muted); letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+
+  .trust-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); }
+
+  /* ── SUCCESS ── */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 44px 24px;
+    background: var(--black2);
+    border: 1px solid rgba(67,160,71,.25);
+    border-radius: 16px;
+  }
+
+  .success-screen.vis { display: block; animation: fadeUp .4s ease forwards; }
+
+  .success-icon {
+    width: 60px; height: 60px;
+    background: rgba(67,160,71,.12);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+  }
+
+  .success-screen h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px; letter-spacing: 2px;
+    color: #66BB6A; margin-bottom: 10px;
+  }
+
+  .success-screen p {
+    font-size: 13px; color: var(--text-muted);
+    line-height: 1.65; max-width: 280px;
+    margin: 0 auto 22px;
+  }
+
+  .tg-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #1976D2; color: #fff; border: none;
+    border-radius: 9px; padding: 12px 22px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; text-decoration: none;
+    transition: opacity .2s;
+  }
+
+  .tg-btn:hover { opacity: .85; }
+
+  /* ── VALIDATION ── */
+  input.err, select.err { border-color: var(--red) !important; }
+  .err-msg { font-size: 10px; color: #EF9A9A; margin-top: 3px; display: none; }
+  .err-msg.vis { display: block; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: .25; }
+  }
+
+  @media (max-width: 400px) {
+    .form-card { padding: 20px 16px; }
+    .header h2 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-wrap">
+      <img src="https://i.ibb.co/xqmr893G/image-57d05f2e-2ad9-49e3-80c8-d04d77ece22c-png-1-removebg-preview.png" alt="A-CRYPTO" style="width:88px;height:88px;object-fit:contain;">
+    </div>
+    <h1>КРИПТООБМЕННИК</h1>
+    <h2>ЗАЯВКА НА <span>ОБМЕН</span></h2>
+    <p>Заполните форму — менеджер свяжется с вами в течение 5 минут</p>
+  </div>
+
+  <!-- STEPS -->
+  <div class="steps" id="steps">
+    <div class="step active" id="s1">
+      <div class="step-dot">1</div>
+      <div class="step-label">Обмен</div>
+    </div>
+    <div class="step" id="s2">
+      <div class="step-dot">2</div>
+      <div class="step-label">Контакты</div>
+    </div>
+    <div class="step" id="s3">
+      <div class="step-dot">3</div>
+      <div class="step-label">Готово</div>
+    </div>
+  </div>
+
+  <!-- PAGE 1 -->
+  <div id="pg1">
+    <div class="form-card">
+      <div class="section-title">Что меняем</div>
+
+      <div class="exchange-row">
+        <!-- ОТДАЮ -->
+        <div>
+          <div class="col-label">Отдаю</div>
+          <select id="gc" onchange="updTag('g')">
+            <optgroup label="Криптовалюты">
+              <option value="BTC">Bitcoin (BTC)</option>
+              <option value="ETH">Ethereum (ETH)</option>
+              <option value="USDT" selected>Tether (USDT)</option>
+              <option value="USDC">USD Coin (USDC)</option>
+              <option value="BNB">BNB</option>
+              <option value="SOL">Solana (SOL)</option>
+              <option value="TRX">Tron (TRX)</option>
+              <option value="XRP">Ripple (XRP)</option>
+            </optgroup>
+            <optgroup label="Фиат">
+              <option value="RUB">Рубли (RUB)</option>
+              <option value="USD">Доллары (USD)</option>
+              <option value="EUR">Евро (EUR)</option>
+              <option value="CNY">Юань (CNY)</option>
+              <option value="AED">Дирхам (AED)</option>
+            </optgroup>
+          </select>
+          <div class="amount-wrap">
+            <input type="number" id="ga" placeholder="0.00" min="0" step="any">
+            <span class="cur-tag" id="gtag">USDT</span>
+          </div>
+        </div>
+
+        <!-- ARROW -->
+        <div class="arrow-mid">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M2 9h14M11 5l4 4-4 4" stroke="#D32F2F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- ПОЛУЧАЮ -->
+        <div>
+          <div class="col-label">Получаю</div>
+          <select id="rc" onchange="updTag('r')">
+            <optgroup label="Фиат">
+              <option value="RUB" selected>Рубли (RUB)</option>
+              <option value="USD">Доллары (USD)</option>
+              <option value="EUR">Евро (EUR)</option>
+              <option value="CNY">Юань (CNY)</option>
+              <option value="AED">Дирхам (AED)</option>
+            </optgroup>
+            <optgroup label="Криптовалюты">
+              <option value="BTC">Bitcoin (BTC)</option>
+              <option value="ETH">Ethereum (ETH)</option>
+              <option value="USDT">Tether (USDT)</option>
+              <option value="USDC">USD Coin (USDC)</option>
+              <option value="BNB">BNB</option>
+              <option value="SOL">Solana (SOL)</option>
+              <option value="TRX">Tron (TRX)</option>
+              <option value="XRP">Ripple (XRP)</option>
+            </optgroup>
+          </select>
+          <div class="amount-wrap">
+            <input type="number" id="ra" placeholder="0.00" min="0" step="any">
+            <span class="cur-tag" id="rtag">RUB</span>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="section-title">Формат расчёта</div>
+
+      <div class="pay-grid">
+        <div class="pay-opt sel" onclick="selPay(this,'cash')" data-v="cash">
+          <span class="pay-icon">💵</span>
+          <div class="pay-lbl">Наличные</div>
+        </div>
+        <div class="pay-opt" onclick="selPay(this,'card')" data-v="card">
+          <span class="pay-icon">💳</span>
+          <div class="pay-lbl">Безнал</div>
+        </div>
+        <div class="pay-opt" onclick="selPay(this,'crypto')" data-v="crypto">
+          <span class="pay-icon">🔑</span>
+          <div class="pay-lbl">На кошелёк</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="toStep2()">ДАЛЕЕ →</button>
+
+    <div class="trust">
+      <div class="trust-item"><span class="trust-dot"></span>Лицензия ЦБ РФ</div>
+      <div class="trust-item"><span class="trust-dot"></span>AML / KYC</div>
+      <div class="trust-item"><span class="trust-dot"></span>Ответ 5 минут</div>
+      <div class="trust-item"><span class="trust-dot"></span>Безопасно</div>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div id="pg2" style="display:none;">
+    <div class="form-card" style="animation:fadeUp .4s ease forwards; opacity:0;">
+
+      <div id="sumbar" class="summary"></div>
+
+      <div class="section-title">Контакты</div>
+
+      <div class="field">
+        <label>Телефон *</label>
+        <input type="tel" id="phone" placeholder="+7 (___) ___-__-__" oninput="phoneMask(this)">
+        <div class="err-msg" id="perr">Введите корректный номер</div>
+      </div>
+
+      <div class="field">
+        <label>Telegram *</label>
+        <input type="text" id="tg" placeholder="@username">
+        <div class="err-msg" id="terr">Формат: @username</div>
+      </div>
+
+      <div class="field">
+        <label>Комментарий <span style="font-weight:400;color:#555;text-transform:none;letter-spacing:0">(необязательно)</span></label>
+        <textarea id="cmt" placeholder="Срочность, удобное время, особые пожелания..."></textarea>
+      </div>
+
+    </div>
+
+    <div class="row-btns">
+      <button class="btn-back" onclick="toStep1()">←</button>
+      <button class="btn-primary" onclick="submit()" style="flex:1;">ОТПРАВИТЬ ЗАЯВКУ</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="succ">
+    <div class="success-icon">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <path d="M4 13l7 7L22 6" stroke="#66BB6A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h3>ЗАЯВКА ПРИНЯТА!</h3>
+    <p>Мы получили вашу заявку и свяжемся с вами в течение <strong style="color:#fff">5 минут</strong> для уточнения курса и деталей сделки</p>
+    <a href="https://t.me/acrypto_bot" class="tg-btn" target="_blank">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="white">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8l-1.7 8c-.13.59-.47.73-.95.45l-2.62-1.93-1.27 1.22c-.14.14-.26.26-.53.26l.19-2.67 4.84-4.37c.21-.19-.05-.29-.32-.1L7.9 14.5l-2.56-.8c-.56-.17-.57-.56.12-.83l10.01-3.86c.46-.17.86.11.17.79z"/>
+      </svg>
+      Написать в Telegram
+    </a>
+  </div>
+
+</div>
+
+<script>
+  let pay = 'cash';
+
+  function updTag(s) {
+    const v = document.getElementById(s==='g'?'gc':'rc').value;
+    document.getElementById(s==='g'?'gtag':'rtag').textContent = v;
+  }
+
+  function selPay(el, v) {
+    document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('sel'));
+    el.classList.add('sel');
+    pay = v;
+  }
+
+  function phoneMask(inp) {
+    let v = inp.value.replace(/\D/g,'');
+    if (v.startsWith('8')) v = '7'+v.slice(1);
+    if (!v.startsWith('7') && v.length) v = '7'+v;
+    v = v.slice(0,11);
+    let r = '';
+    if (v.length>0) r = '+'+v[0];
+    if (v.length>1) r += ' ('+v.slice(1,4);
+    if (v.length>=4) r += ') '+v.slice(4,7);
+    if (v.length>=7) r += '-'+v.slice(7,9);
+    if (v.length>=9) r += '-'+v.slice(9,11);
+    inp.value = r;
+  }
+
+  function toStep2() {
+    const amt = document.getElementById('ga').value;
+    if (!amt || parseFloat(amt) <= 0) {
+      const el = document.getElementById('ga');
+      el.classList.add('err');
+      el.style.boxShadow = '0 0 0 3px rgba(211,47,47,.2)';
+      setTimeout(()=>{ el.classList.remove('err'); el.style.boxShadow=''; },2000);
+      return;
+    }
+    const gc = document.getElementById('gc').value;
+    const rc = document.getElementById('rc').value;
+    const pl = {cash:'наличными 💵', card:'безналом 💳', crypto:'на кошелёк 🔑'};
+    document.getElementById('sumbar').innerHTML =
+      `<strong style="color:#fff">Отдаю:</strong> ${amt} ${gc}&nbsp;&nbsp;→&nbsp;&nbsp;<strong style="color:#fff">Получаю:</strong> ${rc}&nbsp;&nbsp;·&nbsp;&nbsp;${pl[pay]}`;
+
+    document.getElementById('pg1').style.display = 'none';
+    document.getElementById('pg2').style.display = 'block';
+
+    const s1 = document.getElementById('s1');
+    s1.classList.remove('active'); s1.classList.add('done');
+    s1.querySelector('.step-dot').innerHTML =
+      '<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1.5 5.5l3 3 5-5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    document.getElementById('s2').classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function toStep1() {
+    document.getElementById('pg2').style.display = 'none';
+    document.getElementById('pg1').style.display = 'block';
+    document.getElementById('s2').classList.remove('active');
+    document.getElementById('s1').classList.remove('done');
+    document.getElementById('s1').classList.add('active');
+    document.getElementById('s1').querySelector('.step-dot').textContent = '1';
+  }
+
+  function submit() {
+    let ok = true;
+    const phone = document.getElementById('phone').value.replace(/\D/g,'');
+    const pe = document.getElementById('perr');
+    if (phone.length < 11) {
+      document.getElementById('phone').classList.add('err');
+      pe.classList.add('vis'); ok = false;
+    } else {
+      document.getElementById('phone').classList.remove('err');
+      pe.classList.remove('vis');
+    }
+    const tg = document.getElementById('tg').value.trim();
+    const te = document.getElementById('terr');
+    if (tg && !tg.startsWith('@')) {
+      document.getElementById('tg').classList.add('err');
+      te.classList.add('vis'); ok = false;
+    } else {
+      document.getElementById('tg').classList.remove('err');
+      te.classList.remove('vis');
+    }
+    if (!ok) return;
+
+    const BOT_TOKEN = '8905002116:AAEZcRPFPBTFKzmR4_hTfXJ6q6dIE1NjxpI';
+    const CHAT_ID   = '-5062902308';
+
+    const giveAmt  = document.getElementById('ga').value || '—';
+    const giveCur  = document.getElementById('gc').value || '—';
+    const recvAmt  = document.getElementById('ra').value || '—';
+    const recvCur  = document.getElementById('rc').value || '—';
+    const phone    = document.getElementById('phone').value;
+    const comment  = document.getElementById('cmt').value.trim();
+    const payLabel = {cash:'💵 Наличные', card:'💳 Безнал', crypto:'🔑 На кошелёк'}[pay] || pay;
+
+    const lines = [
+      '🔔 <b>НОВАЯ ЗАЯВКА — A-CRYPTO</b>',
+      '',
+      '💱 <b>Обмен:</b>',
+      `   Отдаю:    <b>${giveAmt} ${giveCur}</b>`,
+      `   Получаю: <b>${recvAmt} ${recvCur}</b>`,
+      '',
+      `💳 <b>Формат:</b> ${payLabel}`,
+      '',
+      '📞 <b>Контакты:</b>',
+      `   Телефон:  <b>${phone}</b>`,
+      tg ? `   Telegram: <b>${tg}</b>` : null,
+      comment ? `\n💬 <b>Комментарий:</b> ${comment}` : null,
+    ].filter(l => l !== null).join('\n');
+
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: CHAT_ID, text: lines, parse_mode: 'HTML' })
+    });
+
+    document.getElementById('pg2').style.display = 'none';
+    document.getElementById('succ').classList.add('vis');
+    document.getElementById('steps').style.display = 'none';
+  }
+</script>
+</body>
+</html>
